@@ -5,7 +5,7 @@ from .models import *
 class CountryTranslationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CountryTranslation
-        fields = '__all__'
+        fields = ['language_code', 'name']
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -20,7 +20,7 @@ class CityTranslationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CityTranslation
-        fields = '__all__'
+        fields = ['language_code', 'name']
 
 
 class ZipCodeSerializer(serializers.ModelSerializer):

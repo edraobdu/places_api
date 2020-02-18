@@ -7,7 +7,6 @@ from api.models import *
 from api.serializers import CitySerializer
 
 
-
 @api_view(['GET'])
 def cities_list(request, language):
 
