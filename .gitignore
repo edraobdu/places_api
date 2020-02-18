@@ -154,3 +154,5 @@ fabric.properties
 # Project Pruebas API
 /media/
 /static/
+
+db.sqlite3

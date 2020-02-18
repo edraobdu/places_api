@@ -1,21 +1,17 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+API REST to search cities information, countries, States/Regions etc.
 
 ### What is this repository for? ###
 
-* Quick summary
+* Query Cities, Countries, States/Regions
 * Version
 * [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
 
 ### How do I get set up? ###
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+* Django 3.0 required
+* Django rest framework 3 required
 
 ### Contribution guidelines ###
 
