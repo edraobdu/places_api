@@ -23,13 +23,18 @@ class CityTranslationSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ZipCodeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ZipCode
+        fields = 'zip_code'
+
+
 class CitySerializer(serializers.ModelSerializer):
     country = CountrySerializer()
     city_translations = CityTranslationSerializer(many=True)
-
-    def get_country(self, language):
-        pass
+    zip_codes = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = City
-        fields = ['zip_code', 'iso_code', 'country', 'city_translations']
+        fields = ['zip_codes', 'iso_code', 'country', 'city_translations']

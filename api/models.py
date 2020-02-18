@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as _
 
 __author__ = 'Bezur'
@@ -8,7 +9,7 @@ __all__ = [
     'Region', 'City',
     'LanguageTranslation', 'CountryTranslation',
     'RegionTranslation', 'CityTranslation',
-    'LanguageChoices'
+    'LanguageChoices', 'ZipCode'
 ]
 
 
@@ -83,9 +84,6 @@ class Region(models.Model):
 
 
 class City(models.Model):
-    zip_code = models.CharField(
-        max_length=6, blank=True
-    )
     iso_code = models.CharField(max_length=3)
     region = models.ForeignKey(
         'Region',
@@ -113,6 +111,23 @@ class City(models.Model):
                 name='unique_country_city'
             )
         ]
+
+
+class ZipCode(models.Model):
+    """A simple object that contains the zip code number for cities"""
+    city = models.ForeignKey(
+        'City',
+        on_delete=models.CASCADE,
+        related_name='zip_codes'
+    )
+    zip_code = models.CharField(
+        max_length=6,
+        validators=[RegexValidator(r'^\d{1,10}$')],
+        unique=True
+    )
+
+    def __str__(self):
+        return self.zip_code
 
 
 # TRANSLATIONS
