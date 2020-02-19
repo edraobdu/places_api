@@ -13,7 +13,7 @@ class CountrySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Country
-        fields = ['iso_code', 'country_translations']
+        fields = ['code', 'country_translations', 'flag']
 
 
 class CityTranslationSerializer(serializers.ModelSerializer):
@@ -37,4 +37,4 @@ class CitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = City
-        fields = ['zip_codes', 'iso_code', 'country', 'city_translations']
+        fields = ['zip_codes', 'code', 'country', 'city_translations', 'flag']

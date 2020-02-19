@@ -1,5 +1,5 @@
 from django.utils.translation import gettext_lazy as _
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -45,28 +45,29 @@ def cities_list(request, language):
             )
         ]
 
-        city_query = request.GET.get('city', '')
-        zip_code_query = request.GET.get('zip_code', '')
-        country_query = request.GET.get('country', '')
+        q = request.GET.get('q', '')
+        country = request.GET.get('country', '')
+        currency = request.GET.get('currency', '')
 
-        if city_query:
-            city_list = City.objects.prefetch_related(*prefetch).filter(
-                city_translations__language_code=language,
-                city_translations__name__istartswith=city_query
-            )[:limit]
-        elif zip_code_query:
-            city_list = City.objects.prefetch_related(*prefetch).filter(
-                zip_codes__zip_code=zip_code_query
-            )[:limit]
-        elif country_query:
-            city_list = City.objects.prefetch_related(*prefetch).filter(
-                country__country_translations__language_code=language,
-                country__country_translations__name__istartswith=country_query
-            )[:limit]
-        else:
-            city_list = City.objects.prefetch_related(*prefetch).filter(
-                city_translations__language_code=language,
-            )[:limit]
+        city_list = City.objects.prefetch_related(*prefetch).filter(
+            city_translations__language_code=language
+        )
+
+        if q:
+            city_list = city_list.filter(
+                Q(city_translations__name__istartswith=q)
+                | Q(zip_codes__zip_code=q)
+                | Q(code=q)
+            )
+        if country:
+            city_list = city_list.filter(
+                country__country_translations__name__istartswith=country
+            )
+        if currency:
+            city_list = city_list.filter(
+                country__currency_code__iexact=currency
+            )
+        city_list = city_list.distinct()[:limit]
         serializer = CitySerializer(city_list, many=True)
         return Response(serializer.data)
 
