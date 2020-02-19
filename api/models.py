@@ -6,8 +6,8 @@ __author__ = 'Bezur'
 
 __all__ = [
     'Country', 'Region', 'City', 'CountryTranslation',
-    'RegionTranslation', 'CityTranslation',
-    'LanguageChoices', 'ZipCode'
+    'RegionTranslation', 'CityTranslation', 'ZipCode',
+    'LanguageChoices', 'CurrencyCodeChoices'
 ]
 
 
