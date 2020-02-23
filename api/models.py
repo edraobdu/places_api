@@ -22,8 +22,24 @@ class CurrencyCodeChoices(models.TextChoices):
 class LanguageChoices(models.TextChoices):
     """Languages codes following the standard ISO 639-1"""
 
+    ABKHAZIAN = 'ab', _('Abkhazian')
+    AFAR = 'aa', _('Afar')
+    AFRIKAANS = 'af', _('Afrikaans')
+    AKAN = 'ak', _('Akan')
+    ALBANIAN = 'sq', _('Albanian')
+    AMHARIC = 'am', _('Amharic')
+    ARABIC = 'ar', _('Arabic')
+    ARAGONESE = 'an', _('Aragonese')
+    ARMENIAN = 'hy', _('Armenian')
+    ASSAMESE = 'as', _('Assamese')
+    AVARIC = 'av', _('Avaric')
+    AVESTAN = 'ae', _('Avestan')
+    AYMARA = 'ay', _('Aymara')
+    AZERBAIJANI = 'az', _('Azerbaijani')
+
     ENGLISH = 'en', _('English')
     SPANISH = 'es', _('Spanish')
+    DEUTSCH = 'de', _('Deutsch')
 
 
 class AbstractTranslation(models.Model):

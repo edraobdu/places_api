@@ -1,10 +1,18 @@
+import django_excel
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Prefetch, Q
+from django.shortcuts import render
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from api.models import *
 from api.serializers import CitySerializer
+from api.forms import UploadFile
+from api.helpers import handle_uploaded_countries
 
 
 @api_view(['GET'])
@@ -105,3 +113,53 @@ def cities_list(request, language):
         serializer = CitySerializer(city_list, many=True)
         return Response(serializer.data)
 
+
+def upload_country(request):
+
+    if request.method == 'POST':
+        file = UploadFile(request.POST, request.FILES)
+        if file.is_valid():
+            errors = handle_uploaded_countries(request.FILES['file'])
+            if errors:
+                return render(request, 'UploadCountries.html', {
+                    "file": file,
+                    "errors": errors
+                })
+            else:
+                return HttpResponseRedirect(
+                    reverse('cities-list', kwargs={'language': 'en'})
+                )
+    else:
+        file = UploadFile()
+
+    return render(request, 'UploadCountries.html', {
+        "file": file
+    })
+
+
+def download_countries(request, empty):
+
+    countries = Country.objects.prefetch_related(
+        'country_translations'
+    ).all()
+    headers = ['code', 'currency_code']
+
+    language_choices = LanguageChoices.values
+    for language_code in language_choices.sort():
+        headers.append(language_code)
+
+    countries_list = [headers]
+
+    if not empty:
+        for country in countries:
+            country_row = [country.code, country.currency_code]
+            for translation in country.country_translations.all().order_by('language_code'):
+                country_row.append(translation.name)
+            countries_list.append(country_row)
+    return django_excel.make_response_from_array(
+        countries_list,
+        'xls',
+        file_name="Countries - %(date)s" % {
+            "date": timezone.now().strftime("%d-%M-%Y")
+        }
+    )

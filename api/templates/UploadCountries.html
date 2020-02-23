@@ -1,0 +1,9 @@
+{% extends 'BaseUpload.html' %}
+
+{% block head_title %}Xls Countries{% endblock %}
+
+{% block body_title %}Download and Edit the Countries{% endblock %}
+
+{% block url_full %}{% url 'download-countries' 0 %}{% endblock %}
+
+{% block url_empty %}{% url 'download-countries' 1 %}{% endblock %}

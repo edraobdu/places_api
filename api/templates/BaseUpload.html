@@ -1,0 +1,123 @@
+<html lang="'en">
+    <head>
+        <title>{% block head_title %}{% endblock %}</title>
+
+        <style rel="stylesheet">
+            * {
+                padding: 0;
+                margin: 0;
+                font-size: 11pt;
+            }
+            body {
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                height: 95vh;
+            }
+
+            .container {
+                width: 90%;
+                max-width: 600px;
+            }
+
+            #uploading_modal{
+                display: none;
+                position: fixed;
+                width: 100%;
+                height: 100vh;
+                background-color: rgba(128, 128, 128, 0.3);
+                color: white;
+                font-weight: bolder;
+            }
+
+            form > div {
+                width: 100%;
+                text-align: center
+            }
+
+            form > div > div {
+                padding: 20px;
+                margin: 15px 0;
+            }
+
+            form > div > div > h3 {
+                margin-bottom: 20px;
+            }
+
+            .errors {
+                list-style: none;
+                width: 100%;
+                padding: 20px;
+                text-align: center;
+            }
+
+            .errors .error {
+                font-size: 0.8rem;
+                color: darkred;
+                font-style: italic;
+            }
+        </style>
+    </head>
+    <body>
+
+        <div class="container">
+
+            <ul class="errors">
+                {% for error in errors %}<li class="error">{{ error }}</li>{% endfor %}
+            </ul>
+
+            <form method="post" enctype="multipart/form-data" onsubmit="showUploadingModal()">
+                {% csrf_token %}
+                <div>
+                    <h2>{% block body_title %}{% endblock %}</h2>
+                    <div>
+                        <h3>1) Please, Download the file</h3>
+                        <label for="empty">Download empty? <input type="checkbox" id="empty" checked></label>
+                        <a href="{% block url_full %}{% endblock %}" target="_blank" id="download_full">Download Information</a>
+                        <a href="{% block url_empty %}{% endblock %}" target="_blank" id="download_empty">Download Only Schema</a>
+                    </div>
+                    <div>
+                        <h3>2) Please, upload the file</h3>
+                        <p>{{ file.file }}</p>
+                    </div>
+                    <div>
+                        <input type="submit" value="Upload File">
+                    </div>
+                </div>
+            </form>
+
+        </div>
+
+        <div id="uploading_modal">
+            Please be patient, we'reuploading the information, this might take a few minutes ...
+        </div>
+
+        <script>
+            let empty = document.getElementById('empty');
+            let download_empty = document.getElementById('download_empty');
+            let download_full = document.getElementById('download_full');
+
+            empty.addEventListener('change', e => {showLinkToDownload(e.target)});
+
+            function showLinkToDownload (target) {
+                if (target.checked === true) {
+                    download_empty.style.display = 'inline-block';
+                    download_full.style.display = 'none';
+                } else {
+                    download_empty.style.display = 'none';
+                    download_full.style.display = 'inline-block';
+                }
+            }
+
+            showLinkToDownload(empty);
+
+            let uploading_modal = document.getElementById('uploading_modal');
+
+            function showUploadingModal() {
+                uploading_modal.style.display = 'block';
+            }
+        </script>
+    </body>
+</html>
