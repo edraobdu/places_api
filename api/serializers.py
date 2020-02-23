@@ -16,6 +16,20 @@ class CountrySerializer(serializers.ModelSerializer):
         fields = ['code', 'country_translations', 'flag']
 
 
+class RegionTranslationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RegionTranslation
+        fields = ['language_code', 'name']
+
+
+class RegionSerializer(serializers.ModelSerializer):
+    region_translations = RegionTranslationSerializer(many=True)
+
+    class Meta:
+        model = Country
+        fields = ['code', 'region_translations', 'flag']
+
+
 class CityTranslationSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -32,9 +46,10 @@ class ZipCodeSerializer(serializers.ModelSerializer):
 
 class CitySerializer(serializers.ModelSerializer):
     country = CountrySerializer()
+    region = RegionSerializer()
     city_translations = CityTranslationSerializer(many=True)
     zip_codes = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = City
-        fields = ['zip_codes', 'code', 'country', 'city_translations', 'flag']
+        fields = ['id', 'zip_codes', 'code', 'country', 'region', 'city_translations', 'flag']
