@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'm)#u*d3s=0j0grxet%w012p_x8xnkl!ws#4eo(_njq2s@=i(qu'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['maleant.com']
 
 FILE_UPLOAD_HANDLERS = (
     'django_excel.ExcelMemoryFileUploadHandler',
@@ -85,8 +85,12 @@ WSGI_APPLICATION = 'placesapi.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'places',
+        'PORT': '',
+        'HOST': 'localhost',
+        'USER': 'bezurnet_places',
+        'PASSWORD': 'COlombia-1864'
     }
 }
 
@@ -141,3 +145,9 @@ INTERNAL_IPS = [
 
 # Django Cors Headers
 CORS_ORIGIN_ALLOW_ALL = True
+
+
+try:
+    from .local_settings import *
+except ImportError:
+    pass

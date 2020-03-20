@@ -37,9 +37,62 @@ class LanguageChoices(models.TextChoices):
     AYMARA = 'ay', _('Aymara')
     AZERBAIJANI = 'az', _('Azerbaijani')
 
+    BAMBARA = 'bm', _('Bambara')
+    BASHKIR = 'ba', _('Bashkir')
+    BASQUE = 'eu', _('Basque')
+    BELARUSIAN = 'be', _('Belarusian')
+    BENGALI = 'bn', _('Bengali')
+    BIHARI = 'bh', _('Bihari')
+    BISLAMA = 'bi', _('Bislama')
+    BOSNIA = 'bs', _('Bosnia')
+    BRETON = 'br', _('Breton')
+    BULGARIAN = 'bg', _('Bulgarian')
+    BURMESE = 'my', _('Burmese')
+
+    CATALAN = 'ca', _('Catalan')
+    CHAMORRO = 'ch', _('Chamorro')
+    CHECHEN = 'ce', _('Chechen')
+    CHICHEWA = 'ny', _('Chichewa')
+    CHINESE = 'zh', _('Chinese')
+    CHUVASH = 'cv', _('Chuvash')
+    CORNISH = 'kw', _('Cornish')
+    CORSICAN = 'co', _('Corsican')
+    CREE = 'cr', _('Cree')
+    CROATIAN = 'hr', _('Croatian')
+    CZECH = 'cs', _('Czech')
+
+    DANISH = 'da', _('Danish')
+    DIVEHI = 'dv', _('Divehi')
+    DUTCH = 'nl', _('Dutch')
+    DZONGKHA = 'dz', _('Dzongkha')
+
     ENGLISH = 'en', _('English')
+    ESPERANTO = 'eo', _('Esperanto')
+    ESTONIAN = 'et', _('Estonian')
+    EWE = 'ee', _('Ewe')
+
+    FAROESE = 'fo', _('Faroese')
+    FIJIAN = 'fj', _('Fijian')
+    FINNISH = 'fi', _('Finnish')
+    FRENCH = 'fr', _('French')
+    FULAH = 'ff', _('Fulah')
+
+    GALICIAN = 'gl', _('Galician')
+    GEORGIAN = 'ka', _('Georgian')
+    GERMAN = 'de', _('German')
+    GREEK = 'el', _('Greek')
+    GUARANI = 'gn', _('Guarani')
+    GUJARATI = 'gu', _('Gujarati')
+
+    HAITIAN = 'ht', _('Haitian')
+    HAUSA = 'ha', _('Hausa')
+    HEBREW = 'he', _('Hebrew')
+    HERERO = 'hz', _('Herero')
+    HINDI = 'hi', _('Hindi')
+    HIRI_MOTU = 'ho', _('Hiri Motu')
+    HUNGARIAN = 'hu', _('Hungarian')
+
     SPANISH = 'es', _('Spanish')
-    DEUTSCH = 'de', _('Deutsch')
 
 
 class AbstractTranslation(models.Model):
