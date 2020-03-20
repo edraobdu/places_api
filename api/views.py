@@ -1,4 +1,6 @@
 import django_excel
+
+from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Prefetch, Q
@@ -9,21 +11,33 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+
 from api.models import *
 from api.serializers import CitySerializer
 from api.forms import UploadFile
-from api.helpers import handle_uploaded_countries
+from api.helpers import handle_uploaded_countries, handle_uploaded_regions
 
 
 @api_view(['GET'])
 def cities_list(request, language):
-
+    """
+    This view will handle will show a list fo cities with all its related
+    information, like region and country it belongs to, with their respective
+    translations, the zip_codes if there is any, currency code and flag of
+    the country.
+    """
     if request.method == 'GET':
 
+        q = request.GET.get('q', None)
+        # We ensure 2 characters at least for a searching query
+        if q and len(q) <= 2:
+            q = None
+        extra_lang = request.GET.get('extra_lang', q)
+
         # Limiting the list so we don't overload the database
-        limit = request.GET.get('limit', 50)
-        if limit > 200:
-            limit = 200
+        limit = request.GET.get('limit', 20)
+        if limit > 50:
+            limit = 50
 
         if language not in LanguageChoices.values:
             return Response(
@@ -35,45 +49,55 @@ def cities_list(request, language):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        if extra_lang and extra_lang != language and extra_lang not in LanguageChoices.values:
+            extra_lang = None
+
+        # Query sets to prefetch the data, we don't have to apply distinct in
+        # here because we already checked whether extra_lang was different
+        # than language or not
+        cities_translations_queryset = CityTranslation.objects.filter(language_code=language)
+        regions_translations_queryset = RegionTranslation.objects.filter(language_code=language)
+        countries_translations_queryset = CountryTranslation.objects.filter(language_code=language)
+        if extra_lang:
+            cities_translations_queryset = CityTranslation.objects.filter(
+                Q(language_code=language) & Q(language_code=extra_lang)
+            )
+            regions_translations_queryset = RegionTranslation.objects.filter(
+                Q(language_code=language) & Q(language_code=extra_lang)
+            )
+            countries_translations_queryset = CountryTranslation.objects.filter(
+                Q(language_code=language) & Q(language_code=extra_lang)
+            )
+
         prefetch = [
             Prefetch(
                 'city_translations',
-                queryset=CityTranslation.objects.filter(
-                    language_code=language
-                )
+                queryset=cities_translations_queryset
             ),
             Prefetch(
                 'country__country_translations',
-                queryset=CountryTranslation.objects.filter(
-                    language_code=language
-                )
+                queryset=countries_translations_queryset
             ),
             Prefetch(
                 'region__region_translations',
-                queryset=RegionTranslation.objects.filter(
-                    language_code=language
-                )
+                queryset=regions_translations_queryset
             ),
             Prefetch(
                'zip_codes',
             )
         ]
 
-        q = request.GET.get('q', None)
-
         # We can get a sequence of queries separated by semi-colons
         # with this order: City, Region (or Country), Country
         # if only one section is passed, that will always be the city,
         # the second section could be either the region or the country, and,
         # if a third section is passed, that will always be the country
-
         city_query = None
         region_query = None
         country_query = None
         if q:
             queries = list(map(lambda x: x.strip(), q.split(',', 2)))
             # Should always exists if 'q' is passed
-            print(len(queries))
             city_query = queries[0]
             if len(queries) >= 2:
                 region_query = queries[1]
@@ -84,28 +108,34 @@ def cities_list(request, language):
 
         if city_query:
             city_list = city_list.filter(
-                Q(city_translations__name__istartswith=city_query) & Q(city_translations__language_code=language)
+                Q(city_translations__name__istartswith=city_query)
+                & Q(city_translations__language_code=language)
                 | Q(zip_codes__zip_code=city_query)
                 | Q(code=city_query)
             )
         if region_query and not country_query:
             city_list = city_list.filter(
-                Q(region__region_translations__name__istartswith=region_query) & Q(region__region_translations__language_code=language)
+                Q(region__region_translations__name__istartswith=region_query)
+                & Q(region__region_translations__language_code=language)
                 | Q(region__code__iexact=region_query)
-                | Q(country__country_translations__name__istartswith=region_query) & Q(country__country_translations__language_code=language)
+                | Q(country__country_translations__name__istartswith=region_query)
+                & Q(country__country_translations__language_code=language)
                 | Q(country__code__iexact=region_query)
             )
         else:
             if region_query and country_query:
                 city_list = city_list.filter(
-                    Q(region__region_translations__name__istartswith=region_query) & Q(region__region_translations__language_code=language)
+                    Q(region__region_translations__name__istartswith=region_query)
+                    & Q(region__region_translations__language_code=language)
                     | Q(region__code__iexact=region_query),
-                    Q(country__country_translations__name__istartswith=country_query) & Q(country__country_translations__language_code=language)
+                    Q(country__country_translations__name__istartswith=country_query)
+                    & Q(country__country_translations__language_code=language)
                     | Q(country__code__iexact=country_query)
                 )
             if country_query and not region_query:
                 city_list = city_list.filter(
-                    Q(country__country_translations__name__istartswith=country_query) & Q(country__country_translations__language_code=language)
+                    Q(country__country_translations__name__istartswith=country_query)
+                    & Q(country__country_translations__language_code=language)
                     | Q(country__code__iexact=country_query)
                 )
 
@@ -114,8 +144,12 @@ def cities_list(request, language):
         return Response(serializer.data)
 
 
+@login_required
 def upload_country(request):
-
+    """
+    Uploads the countries information and translations via a plain text file,
+    say an xls aor ods file
+    """
     if request.method == 'POST':
         file = UploadFile(request.POST, request.FILES)
         if file.is_valid():
@@ -137,19 +171,24 @@ def upload_country(request):
     })
 
 
+@login_required
 def download_countries(request, empty):
-
+    """
+    Downloads the file for uploading later the countries' information. It could
+    be a filled file, with all the information already in the database, or an
+    and empty file, only with the required file schema
+    """
     countries = Country.objects.prefetch_related(
         'country_translations'
     ).all()
     headers = ['code', 'currency_code']
 
     language_choices = LanguageChoices.values
-    for language_code in language_choices.sort():
+    language_choices.sort()
+    for language_code in language_choices:
         headers.append(language_code)
 
     countries_list = [headers]
-
     if not empty:
         for country in countries:
             country_row = [country.code, country.currency_code]
@@ -162,4 +201,69 @@ def download_countries(request, empty):
         file_name="Countries - %(date)s" % {
             "date": timezone.now().strftime("%d-%M-%Y")
         }
+    )
+
+
+@login_required
+def upload_regions(request):
+
+    all_countries = CountryTranslation.objects.filter(language_code='en')
+
+    if request.method == 'POST':
+        file = UploadFile(request.POST, request.FILES)
+        if file.is_valid():
+            errors = handle_uploaded_regions(request.FILES['file'])
+            if errors:
+                return render(request, 'UploadRegions.html', {
+                    "file": file,
+                    "errors": errors,
+                    'countries': all_countries
+                })
+            else:
+                return HttpResponseRedirect(
+                    reverse('cities-list', kwargs={'language': 'en'})
+                )
+    else:
+        file = UploadFile()
+
+    return render(request, 'UploadRegions.html', {
+        "file": file,
+        'countries': all_countries
+    })
+
+
+@login_required
+def download_regions(request, empty):
+    print(request.GET)
+    country_code = request.GET.get('country', '')
+    print(country_code)
+    regions = Region.objects.prefetch_related(
+        'region_translations', 'country'
+    ).all()
+    if country_code:
+        regions.filter(country__code=country_code)
+
+    headers = ['code', 'local_code', 'country_code']
+
+    language_choices = LanguageChoices.values
+    language_choices.sort()
+    for language_code in language_choices:
+        headers.append(language_code)
+
+    regions_list = [headers]
+    if not empty:
+        for region in regions:
+            region_row = [region.code, region.local_code, region.country.code]
+            for translation in region.region_translations.all().order_by('language_code'):
+                region_row.append(translation.name)
+            regions_list.append(region_row)
+
+    file_name = "Regions%(country)s - %(date)s" % {
+        'date': timezone.now().strftime("%d-%M-%Y"),
+        'country': " - %s" % country_code if country_code else ''
+    }
+    return django_excel.make_response_from_array(
+        regions_list,
+        'xls',
+        file_name=file_name
     )

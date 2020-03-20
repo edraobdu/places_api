@@ -22,76 +22,76 @@ class CurrencyCodeChoices(models.TextChoices):
 class LanguageChoices(models.TextChoices):
     """Languages codes following the standard ISO 639-1"""
 
-    ABKHAZIAN = 'ab', _('Abkhazian')
-    AFAR = 'aa', _('Afar')
-    AFRIKAANS = 'af', _('Afrikaans')
-    AKAN = 'ak', _('Akan')
-    ALBANIAN = 'sq', _('Albanian')
-    AMHARIC = 'am', _('Amharic')
-    ARABIC = 'ar', _('Arabic')
-    ARAGONESE = 'an', _('Aragonese')
-    ARMENIAN = 'hy', _('Armenian')
-    ASSAMESE = 'as', _('Assamese')
-    AVARIC = 'av', _('Avaric')
-    AVESTAN = 'ae', _('Avestan')
-    AYMARA = 'ay', _('Aymara')
-    AZERBAIJANI = 'az', _('Azerbaijani')
-
-    BAMBARA = 'bm', _('Bambara')
-    BASHKIR = 'ba', _('Bashkir')
-    BASQUE = 'eu', _('Basque')
-    BELARUSIAN = 'be', _('Belarusian')
-    BENGALI = 'bn', _('Bengali')
-    BIHARI = 'bh', _('Bihari')
-    BISLAMA = 'bi', _('Bislama')
-    BOSNIA = 'bs', _('Bosnia')
-    BRETON = 'br', _('Breton')
-    BULGARIAN = 'bg', _('Bulgarian')
-    BURMESE = 'my', _('Burmese')
-
-    CATALAN = 'ca', _('Catalan')
-    CHAMORRO = 'ch', _('Chamorro')
-    CHECHEN = 'ce', _('Chechen')
-    CHICHEWA = 'ny', _('Chichewa')
-    CHINESE = 'zh', _('Chinese')
-    CHUVASH = 'cv', _('Chuvash')
-    CORNISH = 'kw', _('Cornish')
-    CORSICAN = 'co', _('Corsican')
-    CREE = 'cr', _('Cree')
-    CROATIAN = 'hr', _('Croatian')
-    CZECH = 'cs', _('Czech')
-
-    DANISH = 'da', _('Danish')
-    DIVEHI = 'dv', _('Divehi')
-    DUTCH = 'nl', _('Dutch')
-    DZONGKHA = 'dz', _('Dzongkha')
+    # ABKHAZIAN = 'ab', _('Abkhazian')
+    # AFAR = 'aa', _('Afar')
+    # AFRIKAANS = 'af', _('Afrikaans')
+    # AKAN = 'ak', _('Akan')
+    # ALBANIAN = 'sq', _('Albanian')
+    # AMHARIC = 'am', _('Amharic')
+    # ARABIC = 'ar', _('Arabic')
+    # ARAGONESE = 'an', _('Aragonese')
+    # ARMENIAN = 'hy', _('Armenian')
+    # ASSAMESE = 'as', _('Assamese')
+    # AVARIC = 'av', _('Avaric')
+    # AVESTAN = 'ae', _('Avestan')
+    # AYMARA = 'ay', _('Aymara')
+    # AZERBAIJANI = 'az', _('Azerbaijani')
+    #
+    # BAMBARA = 'bm', _('Bambara')
+    # BASHKIR = 'ba', _('Bashkir')
+    # BASQUE = 'eu', _('Basque')
+    # BELARUSIAN = 'be', _('Belarusian')
+    # BENGALI = 'bn', _('Bengali')
+    # BIHARI = 'bh', _('Bihari')
+    # BISLAMA = 'bi', _('Bislama')
+    # BOSNIA = 'bs', _('Bosnia')
+    # BRETON = 'br', _('Breton')
+    # BULGARIAN = 'bg', _('Bulgarian')
+    # BURMESE = 'my', _('Burmese')
+    #
+    # CATALAN = 'ca', _('Catalan')
+    # CHAMORRO = 'ch', _('Chamorro')
+    # CHECHEN = 'ce', _('Chechen')
+    # CHICHEWA = 'ny', _('Chichewa')
+    # CHINESE = 'zh', _('Chinese')
+    # CHUVASH = 'cv', _('Chuvash')
+    # CORNISH = 'kw', _('Cornish')
+    # CORSICAN = 'co', _('Corsican')
+    # CREE = 'cr', _('Cree')
+    # CROATIAN = 'hr', _('Croatian')
+    # CZECH = 'cs', _('Czech')
+    #
+    # DANISH = 'da', _('Danish')
+    # DIVEHI = 'dv', _('Divehi')
+    # DUTCH = 'nl', _('Dutch')
+    # DZONGKHA = 'dz', _('Dzongkha')
 
     ENGLISH = 'en', _('English')
-    ESPERANTO = 'eo', _('Esperanto')
-    ESTONIAN = 'et', _('Estonian')
-    EWE = 'ee', _('Ewe')
-
-    FAROESE = 'fo', _('Faroese')
-    FIJIAN = 'fj', _('Fijian')
-    FINNISH = 'fi', _('Finnish')
-    FRENCH = 'fr', _('French')
-    FULAH = 'ff', _('Fulah')
-
-    GALICIAN = 'gl', _('Galician')
-    GEORGIAN = 'ka', _('Georgian')
+    # ESPERANTO = 'eo', _('Esperanto')
+    # ESTONIAN = 'et', _('Estonian')
+    # EWE = 'ee', _('Ewe')
+    #
+    # FAROESE = 'fo', _('Faroese')
+    # FIJIAN = 'fj', _('Fijian')
+    # FINNISH = 'fi', _('Finnish')
+    # FRENCH = 'fr', _('French')
+    # FULAH = 'ff', _('Fulah')
+    #
+    # GALICIAN = 'gl', _('Galician')
+    # GEORGIAN = 'ka', _('Georgian')
     GERMAN = 'de', _('German')
-    GREEK = 'el', _('Greek')
-    GUARANI = 'gn', _('Guarani')
-    GUJARATI = 'gu', _('Gujarati')
-
-    HAITIAN = 'ht', _('Haitian')
-    HAUSA = 'ha', _('Hausa')
-    HEBREW = 'he', _('Hebrew')
-    HERERO = 'hz', _('Herero')
-    HINDI = 'hi', _('Hindi')
-    HIRI_MOTU = 'ho', _('Hiri Motu')
-    HUNGARIAN = 'hu', _('Hungarian')
-
+    # GREEK = 'el', _('Greek')
+    # GUARANI = 'gn', _('Guarani')
+    # GUJARATI = 'gu', _('Gujarati')
+    #
+    # HAITIAN = 'ht', _('Haitian')
+    # HAUSA = 'ha', _('Hausa')
+    # HEBREW = 'he', _('Hebrew')
+    # HERERO = 'hz', _('Herero')
+    # HINDI = 'hi', _('Hindi')
+    # HIRI_MOTU = 'ho', _('Hiri Motu')
+    # HUNGARIAN = 'hu', _('Hungarian')
+    #
     SPANISH = 'es', _('Spanish')
 
 
@@ -164,6 +164,9 @@ class Region(AbstractPlace):
     for colombia we'll look up the ISO 3166-2:CO
     """
     code = models.CharField(max_length=3)
+    # Besides the standard, some countries require or emit its own code
+    # for every region under its administration
+    local_code = models.CharField(max_length=20, blank=True, default='')
     country = models.ForeignKey(
         'Country',
         null=True,
@@ -193,7 +196,7 @@ class City(AbstractPlace):
     however, it is possible that every country has it's own standard
     system to identify its cities.
 
-    So, we need to apply a unique constraint for 'country' and 'local_code'
+    So, we need to apply a unique constraint for 'country' and 'code'
     """
     code = models.CharField(max_length=10)
     region = models.ForeignKey(

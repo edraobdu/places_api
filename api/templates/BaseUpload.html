@@ -74,9 +74,23 @@
                     <h2>{% block body_title %}{% endblock %}</h2>
                     <div>
                         <h3>1) Please, Download the file</h3>
-                        <label for="empty">Download empty? <input type="checkbox" id="empty" checked></label>
-                        <a href="{% block url_full %}{% endblock %}" target="_blank" id="download_full">Download Information</a>
-                        <a href="{% block url_empty %}{% endblock %}" target="_blank" id="download_empty">Download Only Schema</a>
+
+                        {% if countries %}
+                        <div>
+                            <label for="country">For country</label>
+                            <select id="country">
+                                <option value="">All</option>
+                                {% for country in countries %}
+                                <option value="{{country.country.code}}">{{ country.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <label for="empty">Download empty? <input type="checkbox" id="empty" checked></label>
+                            <a href="{% block url_full %}{% endblock %}" target="_blank" id="download_full">Download Information</a>
+                            <a href="{% block url_empty %}{% endblock %}" target="_blank" id="download_empty">Download Only Schema</a>
+                        </div>
                     </div>
                     <div>
                         <h3>2) Please, upload the file</h3>
@@ -90,6 +104,8 @@
 
         </div>
 
+
+
         <div id="uploading_modal">
             Please be patient, we'reuploading the information, this might take a few minutes ...
         </div>
@@ -98,6 +114,10 @@
             let empty = document.getElementById('empty');
             let download_empty = document.getElementById('download_empty');
             let download_full = document.getElementById('download_full');
+            let country_select_box = document.getElementById('country');
+
+            let href_empty = download_empty.getAttribute('href');
+            let href_full = download_full.getAttribute('href');
 
             empty.addEventListener('change', e => {showLinkToDownload(e.target)});
 
@@ -118,6 +138,14 @@
             function showUploadingModal() {
                 uploading_modal.style.display = 'block';
             }
+
+            country_select_box.addEventListener('change', e => {
+                const country_code = e.target.value;
+                download_empty.setAttribute('href', href_empty + '?country=' + country_code);
+                download_full.setAttribute('href', href_full + '?country=' + country_code);
+            });
+
+
         </script>
     </body>
 </html>
