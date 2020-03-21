@@ -86,7 +86,7 @@ WSGI_APPLICATION = 'placesapi.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'bezurnet_places',
+        'NAME': 'bezurnet_placesapi',
         'PORT': '',
         'HOST': 'localhost',
         'USER': 'bezurnet_places',
