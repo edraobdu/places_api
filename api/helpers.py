@@ -162,6 +162,7 @@ def handle_uploaded_cities(file, country_code):
         # have been already instantiated, so we don't create an instance for
         # every specific region
         for city_array in cities:
+
             if city_array[0].strip() != '':
                 city, city_created = City.objects.get_or_create(
                     code=city_array[0],

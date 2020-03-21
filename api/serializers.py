@@ -26,7 +26,7 @@ class RegionSerializer(serializers.ModelSerializer):
     region_translations = RegionTranslationSerializer(many=True)
 
     class Meta:
-        model = Country
+        model = Region
         fields = ['code', 'local_code', 'region_translations', 'flag']
 
 

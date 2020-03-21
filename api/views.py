@@ -23,7 +23,7 @@ from api.helpers import (
 @api_view(['GET'])
 def api_cities_list(request, language):
     """
-    This view will handle will show a list fo cities with all its related
+    This view will show a list fo cities with all its related
     information, like region and country it belongs to, with their respective
     translations, the zip_codes if there is any, currency code and flag of
     the country.
@@ -34,7 +34,7 @@ def api_cities_list(request, language):
         # We ensure 2 characters at least for a searching query
         if q and len(q) <= 2:
             q = None
-        extra_lang = request.GET.get('extra_lang', q)
+        extra_lang = request.GET.get('extra_lang', language)
 
         # Limiting the list so we don't overload the database
         limit = request.GET.get('limit', 20)
@@ -62,13 +62,13 @@ def api_cities_list(request, language):
         countries_translations_queryset = CountryTranslation.objects.filter(language_code=language)
         if extra_lang:
             cities_translations_queryset = CityTranslation.objects.filter(
-                Q(language_code=language) & Q(language_code=extra_lang)
+                Q(language_code=language) | Q(language_code=extra_lang)
             )
             regions_translations_queryset = RegionTranslation.objects.filter(
-                Q(language_code=language) & Q(language_code=extra_lang)
+                Q(language_code=language) | Q(language_code=extra_lang)
             )
             countries_translations_queryset = CountryTranslation.objects.filter(
-                Q(language_code=language) & Q(language_code=extra_lang)
+                Q(language_code=language) | Q(language_code=extra_lang)
             )
 
         prefetch = [
@@ -107,7 +107,6 @@ def api_cities_list(request, language):
                 country_query = queries[2]
 
         city_list = City.objects.prefetch_related(*prefetch).all()
-
         if city_query:
             city_list = city_list.filter(
                 Q(city_translations__name__istartswith=city_query)
