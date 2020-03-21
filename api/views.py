@@ -15,11 +15,13 @@ from rest_framework.decorators import api_view
 from api.models import *
 from api.serializers import CitySerializer
 from api.forms import UploadFile
-from api.helpers import handle_uploaded_countries, handle_uploaded_regions
+from api.helpers import (
+    handle_uploaded_countries, handle_uploaded_regions, handle_uploaded_cities
+)
 
 
 @api_view(['GET'])
-def cities_list(request, language):
+def api_cities_list(request, language):
     """
     This view will handle will show a list fo cities with all its related
     information, like region and country it belongs to, with their respective
@@ -210,9 +212,10 @@ def upload_regions(request):
     all_countries = CountryTranslation.objects.filter(language_code='en')
 
     if request.method == 'POST':
+        country_code = request.POST.get('country', '')
         file = UploadFile(request.POST, request.FILES)
         if file.is_valid():
-            errors = handle_uploaded_regions(request.FILES['file'])
+            errors = handle_uploaded_regions(request.FILES['file'], country_code)
             if errors:
                 return render(request, 'UploadRegions.html', {
                     "file": file,
@@ -234,9 +237,8 @@ def upload_regions(request):
 
 @login_required
 def download_regions(request, empty):
-    print(request.GET)
+
     country_code = request.GET.get('country', '')
-    print(country_code)
     regions = Region.objects.prefetch_related(
         'region_translations', 'country'
     ).all()
@@ -259,11 +261,76 @@ def download_regions(request, empty):
             regions_list.append(region_row)
 
     file_name = "Regions%(country)s - %(date)s" % {
-        'date': timezone.now().strftime("%d-%M-%Y"),
+        'date': timezone.now().strftime("%d-%m-%Y"),
         'country': " - %s" % country_code if country_code else ''
     }
     return django_excel.make_response_from_array(
         regions_list,
+        'xls',
+        file_name=file_name
+    )
+
+
+@login_required
+def upload_cities(request):
+
+    all_countries = CountryTranslation.objects.filter(language_code='en')
+
+    if request.method == 'POST':
+        country_code = request.POST.get('country', '')
+        file = UploadFile(request.POST, request.FILES)
+        if file.is_valid():
+            errors = handle_uploaded_cities(request.FILES['file'], country_code)
+            if errors:
+                return render(request, 'UploadCities.html', {
+                    "file": file,
+                    "errors": errors,
+                    'countries': all_countries
+                })
+            else:
+                return HttpResponseRedirect(
+                    reverse('cities-list', kwargs={'language': 'en'})
+                )
+    else:
+        file = UploadFile()
+
+    return render(request, 'UploadCities.html', {
+        "file": file,
+        'countries': all_countries
+    })
+
+
+@login_required
+def download_cities(request, empty):
+
+    country_code = request.GET.get('country', '')
+    cities = City.objects.prefetch_related(
+        'city_translations', 'region', 'country'
+    ).all()
+    if country_code:
+        cities.filter(country__code=country_code)
+
+    headers = ['code', 'region_code', 'country_code']
+
+    language_choices = LanguageChoices.values
+    language_choices.sort()
+    for language_code in language_choices:
+        headers.append(language_code)
+
+    cities_list = [headers]
+    if not empty:
+        for city in cities:
+            city_row = [city.code, city.region.code, city.country.code]
+            for translation in city.city_translations.all().order_by('language_code'):
+                city_row.append(translation.name)
+            cities_list.append(city_row)
+
+    file_name = "Cities%(country)s - %(date)s" % {
+        'date': timezone.now().strftime("%d-%m-%Y"),
+        'country': " - %s" % country_code if country_code else ''
+    }
+    return django_excel.make_response_from_array(
+        cities_list,
         'xls',
         file_name=file_name
     )

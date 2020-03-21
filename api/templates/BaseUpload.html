@@ -72,20 +72,19 @@
                 {% csrf_token %}
                 <div>
                     <h2>{% block body_title %}{% endblock %}</h2>
+                    {% if countries %}
+                    <div>
+                        <label for="country">For country</label>
+                        <select id="country" name="country">
+                            <option value=""></option>
+                            {% for country in countries %}
+                            <option value="{{country.country.code}}">{{ country.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
                     <div>
                         <h3>1) Please, Download the file</h3>
-
-                        {% if countries %}
-                        <div>
-                            <label for="country">For country</label>
-                            <select id="country">
-                                <option value="">All</option>
-                                {% for country in countries %}
-                                <option value="{{country.country.code}}">{{ country.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        {% endif %}
                         <div>
                             <label for="empty">Download empty? <input type="checkbox" id="empty" checked></label>
                             <a href="{% block url_full %}{% endblock %}" target="_blank" id="download_full">Download Information</a>

@@ -1,0 +1,9 @@
+{% extends 'BaseUpload.html' %}
+
+{% block head_title %}Xls Cities{% endblock %}
+
+{% block body_title %}Download and Edit the Cities by Country{% endblock %}
+
+{% block url_full %}{% url 'download-cities' 0 %}{% endblock %}
+
+{% block url_empty %}{% url 'download-cities' 1 %}{% endblock %}
