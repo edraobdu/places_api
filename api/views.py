@@ -7,6 +7,9 @@ from django.db.models import Prefetch, Q
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.views.decorators.cache import cache_page
+from django.conf import settings
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -20,6 +23,10 @@ from api.helpers import (
 )
 
 
+CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
+
+
+@cache_page(CACHE_TTL)
 @api_view(['GET'])
 def api_cities_list(request, language):
     """
