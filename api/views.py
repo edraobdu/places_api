@@ -115,16 +115,16 @@ def api_cities_list(request, language):
             city_list = City.objects.prefetch_related(*prefetch).all()
             if city_query:
                 city_list = city_list.filter(
-                    Q(city_translations__name__unaccent__istartswith=city_query)
-                    # Q(city_translations__name__istartswith=city_query)
+                    # Q(city_translations__name__unaccent__istartswith=city_query)
+                    Q(city_translations__name__istartswith=city_query)
                     & Q(city_translations__language_code=language)
                     | Q(zip_codes__zip_code=city_query)
                     | Q(code=city_query)
                 )
             if region_query and not country_query:
                 city_list = city_list.filter(
-                    Q(region__region_translations__name__unaccent__istartswith=region_query)
-                    # Q(region__region_translations__name__istartswith=region_query)
+                    # Q(region__region_translations__name__unaccent__istartswith=region_query)
+                    Q(region__region_translations__name__istartswith=region_query)
                     & Q(region__region_translations__language_code=language)
                     | Q(region__code__iexact=region_query)
                     | Q(country__country_translations__name__unaccent__istartswith=region_query)
@@ -135,19 +135,19 @@ def api_cities_list(request, language):
             else:
                 if region_query and country_query:
                     city_list = city_list.filter(
-                        Q(region__region_translations__name__unaccent__istartswith=region_query)
-                        # Q(region__region_translations__name__istartswith=region_query)
+                        # Q(region__region_translations__name__unaccent__istartswith=region_query)
+                        Q(region__region_translations__name__istartswith=region_query)
                         & Q(region__region_translations__language_code=language)
                         | Q(region__code__iexact=region_query),
-                        Q(country__country_translations__name__unaccent__istartswith=country_query)
-                        # Q(country__country_translations__name__istartswith=country_query)
+                        # Q(country__country_translations__name__unaccent__istartswith=country_query)
+                        Q(country__country_translations__name__istartswith=country_query)
                         & Q(country__country_translations__language_code=language)
                         | Q(country__code__iexact=country_query)
                     )
                 if country_query and not region_query:
                     city_list = city_list.filter(
-                        Q(country__country_translations__name__unaccent__istartswith=country_query)
-                        # Q(country__country_translations__name__istartswith=country_query)
+                        # Q(country__country_translations__name__unaccent__istartswith=country_query)
+                        Q(country__country_translations__name__istartswith=country_query)
                         & Q(country__country_translations__language_code=language)
                         | Q(country__code__iexact=country_query)
                     )
