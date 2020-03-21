@@ -86,7 +86,7 @@ WSGI_APPLICATION = 'placesapi.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'places',
+        'NAME': 'bezurnet_places',
         'PORT': '',
         'HOST': 'localhost',
         'USER': 'bezurnet_places',
@@ -146,6 +146,19 @@ INTERNAL_IPS = [
 # Django Cors Headers
 CORS_ORIGIN_ALLOW_ALL = True
 
+
+# Cache Redis
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:41839/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"
+        },
+    }
+}
+
+CACHE_TTL = 60 * 30
 
 try:
     from .local_settings import *
