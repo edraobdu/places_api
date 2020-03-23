@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Prefetch, Q
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from django.views.decorators.cache import cache_page
 from django.conf import settings
@@ -58,7 +58,7 @@ def api_cities_list(request, language):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if extra_lang and extra_lang != language and extra_lang not in LanguageChoices.values:
+        if extra_lang or extra_lang == language or extra_lang not in LanguageChoices.values:
             extra_lang = None
 
         # Query sets to prefetch the data, we don't have to apply distinct in
@@ -116,7 +116,7 @@ def api_cities_list(request, language):
             if city_query:
                 city_list = city_list.filter(
                     # Q(city_translations__name__unaccent__istartswith=city_query)
-                    Q(city_translations__name__istartswith=city_query)
+                    Q(city_translations__name__icontains=city_query)
                     & Q(city_translations__language_code=language)
                     | Q(zip_codes__zip_code=city_query)
                     | Q(code=city_query)
@@ -124,11 +124,11 @@ def api_cities_list(request, language):
             if region_query and not country_query:
                 city_list = city_list.filter(
                     # Q(region__region_translations__name__unaccent__istartswith=region_query)
-                    Q(region__region_translations__name__istartswith=region_query)
+                    Q(region__region_translations__name__icontains=region_query)
                     & Q(region__region_translations__language_code=language)
                     | Q(region__code__iexact=region_query)
                     # | Q(country__country_translations__name__unaccent__istartswith=region_query)
-                    | Q(country__country_translations__name__istartswith=region_query)
+                    | Q(country__country_translations__name__icontains=region_query)
                     & Q(country__country_translations__language_code=language)
                     | Q(country__code__iexact=region_query)
                 )
@@ -136,18 +136,18 @@ def api_cities_list(request, language):
                 if region_query and country_query:
                     city_list = city_list.filter(
                         # Q(region__region_translations__name__unaccent__istartswith=region_query)
-                        Q(region__region_translations__name__istartswith=region_query)
+                        Q(region__region_translations__name__icontains=region_query)
                         & Q(region__region_translations__language_code=language)
                         | Q(region__code__iexact=region_query),
                         # Q(country__country_translations__name__unaccent__istartswith=country_query)
-                        Q(country__country_translations__name__istartswith=country_query)
+                        Q(country__country_translations__name__icontains=country_query)
                         & Q(country__country_translations__language_code=language)
                         | Q(country__code__iexact=country_query)
                     )
                 if country_query and not region_query:
                     city_list = city_list.filter(
                         # Q(country__country_translations__name__unaccent__istartswith=country_query)
-                        Q(country__country_translations__name__istartswith=country_query)
+                        Q(country__country_translations__name__icontains=country_query)
                         & Q(country__country_translations__language_code=language)
                         | Q(country__code__iexact=country_query)
                     )
@@ -252,36 +252,36 @@ def upload_regions(request):
 def download_regions(request, empty):
 
     country_code = request.GET.get('country', '')
-    regions = Region.objects.prefetch_related(
-        'region_translations', 'country'
-    ).all()
     if country_code:
-        regions.filter(country__code=country_code)
+        regions = Region.objects.prefetch_related(
+            'region_translations', 'country'
+        ).filter(country__code=country_code)
 
-    headers = ['code', 'local_code', 'country_code']
+        headers = ['code', 'local_code', 'country_code']
 
-    language_choices = LanguageChoices.values
-    language_choices.sort()
-    for language_code in language_choices:
-        headers.append(language_code)
+        language_choices = LanguageChoices.values
+        language_choices.sort()
+        for language_code in language_choices:
+            headers.append(language_code)
 
-    regions_list = [headers]
-    if not empty:
-        for region in regions:
-            region_row = [region.code, region.local_code, region.country.code]
-            for translation in region.region_translations.all().order_by('language_code'):
-                region_row.append(translation.name)
-            regions_list.append(region_row)
+        regions_list = [headers]
+        if not empty:
+            for region in regions:
+                region_row = [region.code, region.local_code, region.country.code]
+                for translation in region.region_translations.all().order_by('language_code'):
+                    region_row.append(translation.name)
+                regions_list.append(region_row)
 
-    file_name = "Regions%(country)s - %(date)s" % {
-        'date': timezone.now().strftime("%d-%m-%Y"),
-        'country': " - %s" % country_code if country_code else ''
-    }
-    return django_excel.make_response_from_array(
-        regions_list,
-        'xls',
-        file_name=file_name
-    )
+        file_name = "Regions%(country)s - %(date)s" % {
+            'date': timezone.now().strftime("%d-%m-%Y"),
+            'country': " - %s" % country_code if country_code else ''
+        }
+        return django_excel.make_response_from_array(
+            regions_list,
+            'xls',
+            file_name=file_name
+        )
+    return HttpResponse(_('You must specify the regions\' country'))
 
 
 @login_required
@@ -317,33 +317,34 @@ def upload_cities(request):
 def download_cities(request, empty):
 
     country_code = request.GET.get('country', '')
-    cities = City.objects.prefetch_related(
-        'city_translations', 'region', 'country'
-    ).all()
     if country_code:
-        cities.filter(country__code=country_code)
+        cities = City.objects.prefetch_related(
+            'city_translations', 'region', 'country'
+        ).filter(country__code=country_code)
 
-    headers = ['code', 'region_code', 'country_code']
+        headers = ['code', 'region_code', 'country_code']
 
-    language_choices = LanguageChoices.values
-    language_choices.sort()
-    for language_code in language_choices:
-        headers.append(language_code)
+        language_choices = LanguageChoices.values
+        language_choices.sort()
+        for language_code in language_choices:
+            headers.append(language_code)
 
-    cities_list = [headers]
-    if not empty:
-        for city in cities:
-            city_row = [city.code, city.region.code, city.country.code]
-            for translation in city.city_translations.all().order_by('language_code'):
-                city_row.append(translation.name)
-            cities_list.append(city_row)
+        cities_list = [headers]
+        if not empty:
+            for city in cities:
+                city_row = [city.code, city.region.code, city.country.code]
+                for translation in city.city_translations.all().order_by('language_code'):
+                    city_row.append(translation.name)
+                cities_list.append(city_row)
 
-    file_name = "Cities%(country)s - %(date)s" % {
-        'date': timezone.now().strftime("%d-%m-%Y"),
-        'country': " - %s" % country_code if country_code else ''
-    }
-    return django_excel.make_response_from_array(
-        cities_list,
-        'xls',
-        file_name=file_name
-    )
+        file_name = "Cities%(country)s - %(date)s" % {
+            'date': timezone.now().strftime("%d-%m-%Y"),
+            'country': " - %s" % country_code if country_code else ''
+        }
+        return django_excel.make_response_from_array(
+            cities_list,
+            'xls',
+            file_name=file_name
+        )
+    return HttpResponse(_('You must specify the cities\' country'))
+
