@@ -79,7 +79,7 @@ class LanguageChoices(models.TextChoices):
     #
     # GALICIAN = 'gl', _('Galician')
     # GEORGIAN = 'ka', _('Georgian')
-    GERMAN = 'de', _('German')
+    # GERMAN = 'de', _('German')
     # GREEK = 'el', _('Greek')
     # GUARANI = 'gn', _('Guarani')
     # GUJARATI = 'gu', _('Gujarati')
