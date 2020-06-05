@@ -1,7 +1,7 @@
 channels
 asgiref==3.2.3
 defusedxml==0.6.0
-Django==3.0.3
+Django==3.0.7
 django-cors-headers==3.2.1
 django-debug-toolbar==2.2
 django-excel==0.0.10
