@@ -8,7 +8,7 @@ django-excel==0.0.10
 django-redis==4.11.0
 djangorestframework==3.11.0
 lml==0.0.9
-lxml==4.5.0
+lxml==4.6.2
 odfpy==1.4.1
 Pillow==7.0.0
 psycopg2==2.8.4
